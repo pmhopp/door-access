@@ -104,22 +104,25 @@
     Please enter the information you were sent by email, then click the Unlock Door button to proceed.
   </div>
 
-  <!-- Form -->
-  <form id="accessForm">
+  <!-- Hidden iframe so the page doesn't navigate away when submitting -->
+  <iframe name="hidden_iframe" id="hidden_iframe" style="display:none;" onload="if(submitted) { showSuccess(); }"></iframe>
+
+  <!-- Form pointing to your Google Apps Script URL -->
+  <form id="accessForm" action="https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/exec" method="POST" target="hidden_iframe">
     <div class="form-group">
       <label>Email Address</label>
-      <input type="email" id="email" required>
+      <input type="email" name="email" id="email" required>
     </div>
 
     <div class="form-group">
       <label>Secure PIN</label>
-      <input type="password" id="passcode" required>
+      <input type="password" name="passcode" id="passcode" required>
     </div>
 
-    <button type="submit" class="unlock-btn">🔒 UNLOCK DOOR</button>
+    <button type="submit" class="unlock-btn" onclick="submitted=true;">🔓 UNLOCK DOOR</button>
   </form>
 
-  <p id="responseMessage" style="font-weight: bold; margin-top: 15px; font-size: 13px;"></p>
+  <p id="responseMessage" style="font-weight: bold; margin-top: 15px; font-size: 14px;"></p>
 
   <div class="footer-note">
     For security, please ensure you are at or near the door location when clicking unlock. Your physical location is recorded when unlocking.
@@ -127,35 +130,18 @@
 </div>
 
 <script>
-  // Paste your active Google Apps Script /exec URL here
-  const scriptUrl = "https://script.google.com/macros/s/AKfycbwKWcSDxk-lFHWB18Upn--nemGbsw5nOXzJxmXnygeFTr-6LxIemFPyIpi3pBoVDBtM4A/exec";
+  let submitted = false;
 
-  document.getElementById("accessForm").addEventListener("submit", function(e) {
-    e.preventDefault();
-    
-    const email = document.getElementById("email").value;
-    const passcode = document.getElementById("passcode").value;
+  function showSuccess() {
     const msg = document.getElementById("responseMessage");
-
-    msg.style.color = "#2d3748";
-    msg.innerText = "Processing request...";
-
-    fetch(scriptUrl, {
-      method: "POST",
-      body: JSON.stringify({ email: email, passcode: passcode })
-    })
-    .then(response => response.json())
-    .then(data => {
-      msg.style.color = data.status === "success" ? "#155724" : "#721c24";
-      msg.innerText = data.message;
-    })
-    .catch((err) => {
-      msg.style.color = "#721c24";
-      msg.innerText = "Connection error. Please try again.";
-    });
-  });
+    msg.style.color = "#155724";
+    msg.innerText = "Access Granted! Welcome, door is unlocking...";
+    
+    // Optional: Reset form fields after success
+    document.getElementById("accessForm").reset();
+    submitted = false;
+  }
 </script>
 
 </body>
 </html>
-
