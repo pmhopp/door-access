@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Club Door Access</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding-top: 20%;
+      background-color: #f4f4f9;
+    }
+    .status-box {
+      background: white;
+      padding: 30px;
+      margin: 0 auto;
+      max-width: 300px;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+    .success { color: #2e7d32; font-weight: bold; }
+    .error { color: #c62828; font-weight: bold; }
+  </style>
+</head>
+<body>
+
+<div class="status-box">
+  <h2 id="status">Unlocking Door...</h2>
+  <p id="subtext">Please wait a moment.</p>
+</div>
+
+<script>
+  // Replace this with your exact Apps Script /exec URL
+  const scriptUrl = "https://script.google.com/macros/s/AKfycbwKWcSDxk-lFHWB18Upn--nemGbsw5nOXzJxmXnygeFTr-6LxIemFPyIpi3pBoVDBtM4A/exec";
+
+  // Sends the trigger in the background without needing Google Cookies
+  fetch(scriptUrl, { mode: 'no-cors' })
+    .then(() => {
+      document.getElementById("status").innerText = "Access Granted!";
+      document.getElementById("status").className = "success";
+      document.getElementById("subtext").innerText = "Door is unlocked.";
+    })
+    .catch((err) => {
+      document.getElementById("status").innerText = "Error Triggering Door";
+      document.getElementById("status").className = "error";
+      document.getElementById("subtext").innerText = "Please try again.";
+    });
+</script>
+
+</body>
+</html>
