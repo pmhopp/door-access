@@ -78,6 +78,7 @@
       cursor: pointer;
       margin-top: 10px;
       box-shadow: 0 2px 6px rgba(0,123,255,0.3);
+      transition: background-color 0.2s;
     }
     .unlock-btn:hover { background-color: #0056b3; }
     .welcome-box {
@@ -111,7 +112,7 @@
   <div style="font-size: 28px; margin-bottom: 5px;">🔓</div>
   <div class="subtitle">Side Door - Lobby</div>
   
-  <div class="instructions">
+  <div class="instructions" id="instructionText">
     Please enter the information you were sent by email, then click the Unlock Door button to proceed.
   </div>
 
@@ -130,7 +131,7 @@
     <button type="submit" id="unlockBtn" class="unlock-btn">🔓 UNLOCK DOOR</button>
   </form>
 
-  <!-- Welcome Box Matching Image 3 -->
+  <!-- Welcome Box -->
   <div id="welcomeBox" class="welcome-box">Access Granted! Welcome.</div>
 
   <div class="footer-note">
@@ -139,17 +140,17 @@
 </div>
 
 <script>
-  const scriptUrl = "https://script.google.com/macros/s/AKfycbwKWcSDxk-lFHWB18Upn--nemGbsw5nOXzJxmXnygeFTr-6LxIemFPyIpi3pBoVDBtM4A/exec";
+  const scriptUrl = "https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/exec";
 
   document.getElementById("accessForm").addEventListener("submit", function(e) {
     e.preventDefault();
     
-    const email = document.getElementById("email").value;
-    const passcode = document.getElementById("passcode").value;
     const btn = document.getElementById("unlockBtn");
     const welcomeBox = document.getElementById("welcomeBox");
+    const emailInput = document.getElementById("email");
+    const pinInput = document.getElementById("passcode");
 
-    // Step 2: Show "Verifying..." on the button ( matching Image 2 )
+    // Step 2: Show "Verifying..." (Image 2)
     btn.disabled = true;
     btn.style.backgroundColor = "#9ca3af";
     btn.innerText = "Verifying...";
@@ -157,26 +158,21 @@
     // Send data to your Google Apps Script backend
     fetch(scriptUrl, {
       method: "POST",
-      body: JSON.stringify({ email: email, passcode: passcode })
+      body: JSON.stringify({ email: emailInput.value, passcode: pinInput.value })
     })
-    .then(response => response.json())
-    .then(data => {
-      if (data.status === "success" || true) { // Fallback to show success once response returns
-        // Step 3: Show "Unlocked!" and the green welcome box ( matching Image 3 )
-        btn.style.backgroundColor = "#007bff";
-        btn.innerText = "Unlocked!";
-        welcomeBox.style.display = "block";
-      } else {
-        btn.disabled = false;
-        btn.style.backgroundColor = "#dc3545";
-        btn.innerText = "Invalid Credentials";
-      }
-    })
-    .catch((err) => {
-      // Even if CORS blocks reading the payload, trigger the success view like your original script behavior
+    .finally(() => {
+      // Step 3: Show "Unlocked!" and the green welcome box (Image 3)
       btn.style.backgroundColor = "#007bff";
       btn.innerText = "Unlocked!";
       welcomeBox.style.display = "block";
+
+      // Wait 4 seconds, then reset back to Image 1
+      setTimeout(() => {
+        document.getElementById("accessForm").reset();
+        btn.disabled = false;
+        btn.innerText = "🔓 UNLOCK DOOR";
+        welcomeBox.style.display = "none";
+      }, 4000);
     });
   });
 </script>
